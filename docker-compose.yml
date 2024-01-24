@@ -1,0 +1,61 @@
+version: '3'
+services:
+    rundeck:
+        container_name: rundeck
+        build:
+          context: rundeck/rundeck
+          args:
+            RUNDECK_IMAGE: rundeck/rundeck:5.0.1
+        links:
+          - mysql
+        environment:
+            RUNDECK_GRAILS_URL: http://localhost:4440
+            RUNDECK_DATABASE_DRIVER: org.mariadb.jdbc.Driver
+            RUNDECK_DATABASE_USERNAME: rundeck
+            RUNDECK_DATABASE_PASSWORD: rundeck
+            RUNDECK_DATABASE_URL: jdbc:mariadb://mysql/rundeck?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+            RUNDECK_SERVER_ADDRESS: 0.0.0.0
+            RUNDECK_FEATURE_UINEXT_NAME: uiNext
+            RUNDECK_FEATURE_UINEXT_ENABLED: 'true'
+        ports:
+          - 4440:4440
+    mysql:
+        container_name: mysql
+        image: mysql:8
+        expose:
+          - 3306
+        cap_add:
+          - SYS_NICE  # CAP_SYS_NICE reduces error messages in console
+        environment:
+          - MYSQL_ROOT_PASSWORD=root
+          - MYSQL_DATABASE=rundeck
+          - MYSQL_USER=rundeck
+          - MYSQL_PASSWORD=rundeck
+    # psql postgresql://dbuser:password@0.0.0.0:5432/sampledb
+    postgres:
+      image: postgres:15-alpine3.17
+      ports:
+        - 5432:5432
+      volumes:
+        - ~/apps/postgres:/var/lib/postgresql/data
+      environment:
+        - POSTGRES_PASSWORD=password
+        - POSTGRES_USER=dbuser
+        - POSTGRES_DB=sampledb
+    op-connect-api:
+      image: 1password/connect-api:latest
+      ports:
+        - "8080:8080"
+      volumes:
+        - "./1password-credentials.json:/home/opuser/.op/1password-credentials.json"
+        - "data:/home/opuser/.op/data"
+    op-connect-sync:
+      image: 1password/connect-sync:latest
+      ports:
+        - "8081:8080"
+      volumes:
+        - "./1password-credentials.json:/home/opuser/.op/1password-credentials.json"
+        - "data:/home/opuser/.op/data"
+
+volumes:
+  data:
