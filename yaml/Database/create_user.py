@@ -1,7 +1,14 @@
 #/bin/python3
 
+from os import getenv
+
+
 # get email of requesting user from rundeck: $RD_JOB_USERNAME (?)
+REQUESTING_USER = getenv("RD_JOB_USERNAME")
 # generate db user username: <username>
+
+
+
 # generate credential name "<DATABASE> <ENV> <REQUESTED_USER_EMAIL> <DATETIME?>"
 # check db connectivity
 # check 1password connectivity - check credential doesn't already exist with name 
