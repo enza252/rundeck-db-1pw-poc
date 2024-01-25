@@ -3,7 +3,7 @@ services:
     rundeck:
         container_name: rundeck
         build:
-          context: rundeck/rundeck
+          context: .
           args:
             RUNDECK_IMAGE: rundeck/rundeck:5.0.1
         links:
