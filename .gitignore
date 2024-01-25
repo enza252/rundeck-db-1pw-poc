@@ -8,3 +8,4 @@ client/rundeck-cli/node_modules
 client/rundeck-cli/package-lock.json
 
 1password-credentials.json
+.venv

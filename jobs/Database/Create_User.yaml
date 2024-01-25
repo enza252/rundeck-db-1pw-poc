@@ -1,0 +1,54 @@
+- defaultTab: nodes
+  description: ''
+  executionEnabled: true
+  id: a102d346-112b-40c1-b8ca-61c0438790dc
+  loglevel: INFO
+  name: create user
+  nodeFilterEditable: false
+  options:
+  - description: 'Allowed values are database1, database2'
+    name: Database
+    required: true
+    value: database1
+    values:
+    - sampledb
+    valuesListDelimiter: ','
+  - delimiter: ','
+    description: Privileges to be granted to the generated user
+    multivalued: true
+    name: Privileges
+    required: true
+    values:
+    - SELECT
+    - INSERT
+    - UPDATE
+    - DELETE
+    - TRUNCATE
+    - REFERENCES
+    - TRIGGER
+    - CREATE
+    valuesListDelimiter: ','
+  - delimiter: ','
+    multivalued: true
+    name: Tables
+    required: true
+    values:
+    - table1
+    - table2
+    valuesListDelimiter: ','
+  plugins:
+    ExecutionLifecycle: {}
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - configuration:
+        adhocFilepath: /home/rundeck/scripts/Database/create_user.py
+        expandTokenInScriptFile: 'false'
+        fileExtension: .py
+        interpreterArgsQuoted: 'false'
+        scriptInterpreter: /usr/bin/python3
+      nodeStep: true
+      type: script-file-url
+    keepgoing: false
+    strategy: node-first
+  uuid: a102d346-112b-40c1-b8ca-61c0438790dc

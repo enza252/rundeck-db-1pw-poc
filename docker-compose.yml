@@ -31,6 +31,8 @@ services:
           - MYSQL_DATABASE=rundeck
           - MYSQL_USER=rundeck
           - MYSQL_PASSWORD=rundeck
+        volumes:
+          - mysqldb:/var/lib/mysql
     # psql postgresql://dbuser:password@0.0.0.0:5432/sampledb
     postgres:
       image: postgres:15-alpine3.17
@@ -59,3 +61,4 @@ services:
 
 volumes:
   data:
+  mysqldb:
