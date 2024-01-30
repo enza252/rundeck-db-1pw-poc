@@ -6,15 +6,14 @@
   name: create user
   nodeFilterEditable: false
   options:
-  - description: 'Allowed values are database1, database2'
+  - description: Allowed value is sampledb
+    hidden: true
     name: Database
     required: true
-    value: database1
-    values:
-    - sampledb
-    valuesListDelimiter: ','
+    value: sampledb
   - delimiter: ','
     description: Privileges to be granted to the generated user
+    enforced: true
     multivalued: true
     name: Privileges
     required: true
@@ -29,6 +28,7 @@
     - CREATE
     valuesListDelimiter: ','
   - delimiter: ','
+    enforced: true
     multivalued: true
     name: Tables
     required: true
@@ -42,7 +42,7 @@
   sequence:
     commands:
     - configuration:
-        adhocFilepath: /home/rundeck/scripts/Database/create_user.py
+        adhocFilepath: /home/rundeck/scripts/create_user.py
         expandTokenInScriptFile: 'false'
         fileExtension: .py
         interpreterArgsQuoted: 'false'
