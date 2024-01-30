@@ -15,6 +15,11 @@ REQUESTED_PRIVILEGES: str = getenv("RD_OPTION_PRIVILEGES")
 
 OP_CONNECT_TOKEN: str = getenv("OP_CONNECT_TOKEN")
 
+POSTGRES_USER: str = getenv("POSTGRES_USER")
+POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD")
+POSTGRES_DB: str = getenv("POSTGRES_DB")
+POSTGRES_HOST: str = getenv("POSTGRES_HOST")
+
 if REQUESTING_USER is None or REQUESTED_DATABASE is None or REQUESTED_TABLES is None or REQUESTED_PRIVILEGES is None:
     raise Exception("User input values not set")
 
@@ -28,12 +33,12 @@ user = (REQUESTING_USER + REQUESTED_DATABASE).lower()
 # establish database connection
 
 print("Attempting to establish connection with database")
-db_client = psycopg2.connect("postgresql://dbuser:password@0.0.0.0:5432/sampledb")
+db_client = psycopg2.connect(f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}")
 print("Database connection established!")
 
 # establish 1pw connection
 print("Attempting to establish connection with 1Password Connect")
-connect_client: Client = new_client(url="http://0.0.0.0:8080", token=OP_CONNECT_TOKEN)
+connect_client: Client = new_client(url="http://op-connect-api:8080", token=OP_CONNECT_TOKEN)
 print("1Password Connect connection established!")
 
 vault_id = connect_client.get_vault_by_title("poc-test").id

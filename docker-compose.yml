@@ -17,6 +17,11 @@ services:
             RUNDECK_SERVER_ADDRESS: 0.0.0.0
             RUNDECK_FEATURE_UINEXT_NAME: uiNext
             RUNDECK_FEATURE_UINEXT_ENABLED: 'true'
+            OP_CONNECT_TOKEN: ${OP_CONNECT_TOKEN}
+            POSTGRES_USER: dbuser
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: sampledb
+            POSTGRES_HOST: postgres
         ports:
           - 4440:4440
     mysql:
