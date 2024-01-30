@@ -4,6 +4,7 @@ from os import getenv
 from datetime import datetime
 from onepasswordconnectsdk.client import (Client, new_client)
 from onepasswordconnectsdk.models import Item, ItemVault, Field, GeneratorRecipe
+from psycopg2.sql import SQL, Identifier
 
 # get email of requesting user from rundeck: $RD_JOB_USERNAME (?)
 REQUESTING_USER: str = getenv("RD_JOB_USERNAME").replace(".", "")
@@ -38,6 +39,14 @@ print("1Password Connect connection established!")
 vault_id = connect_client.get_vault_by_title("poc-test").id
 credential_title = f"{REQUESTED_DATABASE} {REQUESTED_TABLES} poc {REQUESTING_USER}"
 
+# Check db connection & tables exist
+
+cursor = db_client.cursor()
+
+tables_list = REQUESTED_TABLES.split(",")
+for table in tables_list:
+    cursor.execute(SQL("SELECT * FROM {}").format(Identifier(table)))
+
 # Would want to check the credential doesn't already exist, or if it's active (not tagged, or something similar)
 
 # generate credential name "<DATABASE> <ENV> <REQUESTED_USER_EMAIL> <DATETIME?>"
@@ -68,28 +77,47 @@ for field in created_credential.fields:
 
 # create user in database
 
-cursor = db_client.cursor()
-
-# ToDo - this is currently not working due to a syntax error
-create_user_sql = f"CREATE USER %(username)s WITH PASSWORD %(password)s"
-
-create_user_data = {
-    "username": username,
-    "password": password
-}
-
-cursor.execute(create_user_sql, create_user_data)
+cursor.execute(SQL("CREATE USER {} WITH PASSWORD %s IN ROLE {}").format(Identifier(username), Identifier("dbuser")),
+               (password,))
 
 print(f"Created user {username}")
 
-grant_user_command = f"GRANT %(priv)s ON %(tables)s TO %(username)s"
-grant_user_data = {
-    "priv": REQUESTED_PRIVILEGES,
-    "tables": REQUESTED_TABLES,
-    "username": username
-}
+# this is hacky and bit naff and I hate it but here we go, it's a poc.
+# this is so anti n+1 etc, but again.. it's a poc.
+for table in tables_list:
+    if "SELECT" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT SELECT ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
+    if "DELETE" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT DELETE ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
+    if "UPDATE" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT UPDATE ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
+    if "TRUNCATE" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT DELETE ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
+    if "REFERENCES" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT REFERENCES ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
+    if "TRIGGER" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT REFERENCES ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
+    if "CREATE" in REQUESTED_PRIVILEGES:
+        cursor.execute(SQL("GRANT REFERENCES ON {} TO {}").format(
+            Identifier(table), Identifier(username))
+        )
 
-cursor.execute(grant_user_command, grant_user_data)
 # Maybe there are groups that already exist on the DB that a user can be added to instead
 
 print(f"Granted {REQUESTED_PRIVILEGES} to user {username} on tables {REQUESTED_TABLES}")
+
+db_client.commit()
+
+db_client.close()
