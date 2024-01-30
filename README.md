@@ -1,6 +1,7 @@
 # rundeck-db-1pw-poc
 
 - Generate a `1password-credentials.json` file via the 1Password website.
+- Create a vault in 1Password called `poc-test`.
 - Run `make up`.
 - Run `psql 'postgresql://dbuser\\:password@0.0.0.0:5432/sampledb'` and run `CREATE TABLE table1 ();` and `CREATE TABLE table2 ();`
 - Log in to Rundeck with `admin:admin` at `http://localhost:4040`.

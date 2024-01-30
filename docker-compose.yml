@@ -18,6 +18,7 @@ services:
             RUNDECK_FEATURE_UINEXT_NAME: uiNext
             RUNDECK_FEATURE_UINEXT_ENABLED: 'true'
             OP_CONNECT_TOKEN: ${OP_CONNECT_TOKEN}
+            OP_CONNECT_API_SERVER: http://op-connect-api:8080
             POSTGRES_USER: dbuser
             POSTGRES_PASSWORD: password
             POSTGRES_DB: sampledb

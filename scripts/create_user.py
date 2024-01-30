@@ -14,6 +14,7 @@ REQUESTED_TABLES: str = getenv("RD_OPTION_TABLES")
 REQUESTED_PRIVILEGES: str = getenv("RD_OPTION_PRIVILEGES")
 
 OP_CONNECT_TOKEN: str = getenv("OP_CONNECT_TOKEN")
+OP_CONNECT_API_SERVER: str = getenv("OP_CONNECT_API_SERVER")
 
 POSTGRES_USER: str = getenv("POSTGRES_USER")
 POSTGRES_PASSWORD: str = getenv("POSTGRES_PASSWORD")
@@ -38,7 +39,7 @@ print("Database connection established!")
 
 # establish 1pw connection
 print("Attempting to establish connection with 1Password Connect")
-connect_client: Client = new_client(url="http://op-connect-api:8080", token=OP_CONNECT_TOKEN)
+connect_client: Client = new_client(url=OP_CONNECT_API_SERVER, token=OP_CONNECT_TOKEN)
 print("1Password Connect connection established!")
 
 vault_id = connect_client.get_vault_by_title("poc-test").id
