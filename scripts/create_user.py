@@ -45,17 +45,14 @@ print("1Password Connect connection established!")
 vault_id = connect_client.get_vault_by_title("poc-test").id
 credential_title = f"{REQUESTED_DATABASE} {REQUESTED_TABLES} poc {REQUESTING_USER}"
 
-# Check db connection & tables exist
-
+# Check the tables exist
 cursor = db_client.cursor()
 
 tables_list = REQUESTED_TABLES.split(",")
 for table in tables_list:
     cursor.execute(SQL("SELECT * FROM {}").format(Identifier(table)))
 
-# Would want to check the credential doesn't already exist, or if it's active (not tagged, or something similar)
-
-# generate credential name "<DATABASE> <ENV> <REQUESTED_USER_EMAIL> <DATETIME?>"
+# Generate credential name "<DATABASE> <ENV> <REQUESTED_USER_EMAIL> <DATETIME?>"
 date_now = datetime.today().strftime('%Y-%m-%d')
 item = Item(
     vault=ItemVault(id=vault_id),
@@ -90,6 +87,7 @@ print(f"Created user {username}")
 
 # this is hacky and bit naff and I hate it but here we go, it's a poc.
 # this is so anti n+1 etc, but again.. it's a poc.
+# could probably wrap all of this in an executeMany function. Again, lots of load.
 for table in tables_list:
     if "SELECT" in REQUESTED_PRIVILEGES:
         cursor.execute(SQL("GRANT SELECT ON {} TO {}").format(
@@ -104,7 +102,7 @@ for table in tables_list:
             Identifier(table), Identifier(username))
         )
     if "TRUNCATE" in REQUESTED_PRIVILEGES:
-        cursor.execute(SQL("GRANT DELETE ON {} TO {}").format(
+        cursor.execute(SQL("GRANT TRUNCATE ON {} TO {}").format(
             Identifier(table), Identifier(username))
         )
     if "REFERENCES" in REQUESTED_PRIVILEGES:
@@ -112,18 +110,16 @@ for table in tables_list:
             Identifier(table), Identifier(username))
         )
     if "TRIGGER" in REQUESTED_PRIVILEGES:
-        cursor.execute(SQL("GRANT REFERENCES ON {} TO {}").format(
+        cursor.execute(SQL("GRANT TRIGGER ON {} TO {}").format(
             Identifier(table), Identifier(username))
         )
     if "CREATE" in REQUESTED_PRIVILEGES:
-        cursor.execute(SQL("GRANT REFERENCES ON {} TO {}").format(
+        cursor.execute(SQL("GRANT CREATE ON {} TO {}").format(
             Identifier(table), Identifier(username))
         )
 
-# Maybe there are groups that already exist on the DB that a user can be added to instead
+db_client.commit()
 
 print(f"Granted {REQUESTED_PRIVILEGES} to user {username} on tables {REQUESTED_TABLES}")
-
-db_client.commit()
 
 db_client.close()
