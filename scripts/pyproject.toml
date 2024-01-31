@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "create-user-poc"
+version = "0.1.0"
+description = ""
+authors = ["Ian Ensor <ian@ian-ensor.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+psycopg2 = "^2.9.9"
+onepasswordconnectsdk = "^1.4.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

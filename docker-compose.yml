@@ -3,7 +3,7 @@ services:
     rundeck:
         container_name: rundeck
         build:
-          context: rundeck/rundeck
+          context: .
           args:
             RUNDECK_IMAGE: rundeck/rundeck:5.0.1
         links:
@@ -17,6 +17,12 @@ services:
             RUNDECK_SERVER_ADDRESS: 0.0.0.0
             RUNDECK_FEATURE_UINEXT_NAME: uiNext
             RUNDECK_FEATURE_UINEXT_ENABLED: 'true'
+            OP_CONNECT_TOKEN: ${OP_CONNECT_TOKEN}
+            OP_CONNECT_API_SERVER: http://op-connect-api:8080
+            POSTGRES_USER: dbuser
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: sampledb
+            POSTGRES_HOST: postgres
         ports:
           - 4440:4440
     mysql:
@@ -31,6 +37,8 @@ services:
           - MYSQL_DATABASE=rundeck
           - MYSQL_USER=rundeck
           - MYSQL_PASSWORD=rundeck
+        volumes:
+          - mysqldb:/var/lib/mysql
     # psql postgresql://dbuser:password@0.0.0.0:5432/sampledb
     postgres:
       image: postgres:15-alpine3.17
@@ -59,3 +67,4 @@ services:
 
 volumes:
   data:
+  mysqldb:
